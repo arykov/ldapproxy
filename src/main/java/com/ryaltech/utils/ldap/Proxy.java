@@ -500,11 +500,7 @@ public final class Proxy {
 		verbose = proxyParameters.verbose;
 
 		// Create load balancer.
-		final List<ConnectionFactory> factories = new LinkedList<ConnectionFactory>();
-		final List<ConnectionFactory> bindFactories = new LinkedList<ConnectionFactory>();
-
-		factories
-				.add(Connections.newFixedConnectionPool(
+		final ConnectionFactory factory = Connections.newFixedConnectionPool(
 						Connections.newAuthenticatedConnectionFactory(
 								Connections
 										.newHeartBeatConnectionFactory(new LDAPConnectionFactory(
@@ -514,16 +510,8 @@ public final class Proxy {
 										proxyParameters.proxyDN,
 										proxyParameters.proxyPassword
 												.toCharArray())),
-						Integer.MAX_VALUE));
-		bindFactories.add(Connections.newFixedConnectionPool(Connections
-				.newHeartBeatConnectionFactory(new LDAPConnectionFactory(
-						proxyParameters.remoteAddress,
-						proxyParameters.remotePort)), Integer.MAX_VALUE));
+						Integer.MAX_VALUE);
 
-		final RoundRobinLoadBalancingAlgorithm algorithm = new RoundRobinLoadBalancingAlgorithm(
-				factories);
-		final ConnectionFactory factory = Connections
-				.newLoadBalancer(algorithm);
 
 		// Create a server connection adapter.
 		final ProxyBackend backend = new ProxyBackend(factory);
