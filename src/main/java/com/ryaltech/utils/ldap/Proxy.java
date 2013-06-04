@@ -105,12 +105,11 @@ public final class Proxy {
 	private static final class ProxyBackend implements
 			RequestHandler<RequestContext> {
 		private final ConnectionFactory factory;
-		private final ConnectionFactory bindFactory;
+		
 
-		private ProxyBackend(final ConnectionFactory factory,
-				final ConnectionFactory bindFactory) {
+		private ProxyBackend(final ConnectionFactory factory) {
 			this.factory = factory;
-			this.bindFactory = bindFactory;
+		
 		}
 
 		private abstract class AbstractRequestCompletionHandler<R extends Result, H extends ResultHandler<? super R>>
@@ -523,15 +522,11 @@ public final class Proxy {
 
 		final RoundRobinLoadBalancingAlgorithm algorithm = new RoundRobinLoadBalancingAlgorithm(
 				factories);
-		final RoundRobinLoadBalancingAlgorithm bindAlgorithm = new RoundRobinLoadBalancingAlgorithm(
-				bindFactories);
 		final ConnectionFactory factory = Connections
 				.newLoadBalancer(algorithm);
-		final ConnectionFactory bindFactory = Connections
-				.newLoadBalancer(bindAlgorithm);
 
 		// Create a server connection adapter.
-		final ProxyBackend backend = new ProxyBackend(factory, bindFactory);
+		final ProxyBackend backend = new ProxyBackend(factory);
 		final ServerConnectionFactory<LDAPClientContext, Integer> connectionHandler = Connections
 				.newServerConnectionFactory(backend);
 
